@@ -14,11 +14,8 @@
     <meta name="description" content="Image Upload Test">
     <meta name="keywords" content="image upload">
 
-    <link rel="stylesheet" type="text/css" href="/adpe/jqueryui/jquery-ui.min.css" />
-    <link rel="stylesheet" type="text/css" href="/asdweb_main.css" />
-    <script src="/adpe/jqueryui/external/jquery/jquery.js"></script>
-    <script src="/adpe/jqueryui/jquery-ui.min.js"></script>
-    <script src="/rqoogle/app_js.js"></script>
+    <link rel="stylesheet" type="text/css" href="/js/jquery-ui.min.css" />
+    <script src="/js/jquery.js"></script>
     <!--- image cropper scripts --->
     <script src="cropper.js"></script>
     <link rel="stylesheet" type="text/css" href="cropper.css">
