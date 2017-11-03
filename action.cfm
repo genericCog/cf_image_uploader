@@ -1,4 +1,7 @@
-<!--- CFM Action page for form submit on page _up_7.cfm --->
+<!--- File: up_action.cfm
+    Called From: index.cfm  Associated Files: index.cfm, profile_image_scripts.js, image_cropper.js, up_action.cfm, up.cfc
+    Purpose: Image processing on Form submit. Writes image to server, deletes old image, returns to calling page with URL parameters
+--->
 <cfsetting showdebugoutput="false">
 <div style="background-image:linear-gradient(to top,rgba(255, 255, 255, 0.3), rgb(240, 240, 240));">
 <cfinvoke component="up" method="session_user_profile" returnvariable="get_session_user_profile"/>
@@ -19,28 +22,15 @@
     <script>console.log('Warning: Session Environment is empty.');</script>
 </cfif>
 
-<cfset referer_cfm_page = "profile_image_upload_v3.cfm">
-<!--- 
-<cffunction name="dumpAll">
-    <cfdump var='#cgi#'>
-    <cfdump var="#form#"> 
-    <cfdump var="#variables#"> 
-    <cfdump var="#request#">
-</cffunction>
-<cfset dumpAll()>--->
-
+    <cfset referer_cfm_page = "index.cfm">
 <!--- begin image processing --->
 <cfif cgi.request_method IS "post" AND 
-      ( 
-      structKeyExists(form,"hidden_input_image_file") 
-      OR 
-      structKeyExists(form,"hidden_input_image_file_cropped") 
-      )>
+      ( structKeyExists(form,"hidden_input_image_file") OR structKeyExists(form,"hidden_input_image_file_cropped") )>
 
     <cfif structKeyExists(form,"hidden_cropped_flag")>
-        <cfset search_text_area = #form.hidden_input_image_file_cropped#><!--- search_text_area if image IS cropped --->
+        <cfset search_text_area = #form.hidden_input_image_file_cropped#>
     <cfelse>
-        <cfset search_text_area = #form.hidden_input_image_file#><!--- search_text_area if image IS NOT cropped --->
+        <cfset search_text_area = #form.hidden_input_image_file#>
     </cfif>
 
   <cfif (trim(form.hidden_input_image_file) NEQ '') OR (trim(form.hidden_input_image_file_cropped) NEQ '')>
@@ -115,11 +105,12 @@
                 <cfset local_occurrence = mid(#search_text_area#, (#starting_index# + #header_length#), ((#ending_index# - #header_length#)-#starting_index#))>
                 <cfset image = imageReadBase64(#local_occurrence#)><cfoutput>#ending_index#</cfoutput>
                 <cfset name_of_image    = #CreateUUID()#>
-        <cfimage action="resize" height="300" width="200" 
-        source="#image#" 
-        destination="#path_server_directory##name_of_image##file_type_png#" nameconflict="MAKEUNIQUE" overwrite="yes" />
-        <!---
-                <cfimage action="write" source="#image#" destination="#path_server_directory##name_of_image##file_type_png#" nameconflict="MAKEUNIQUE"> --->
+                <cfimage action="resize" height="300" width="200" 
+                         source="#image#" 
+                         destination="#path_server_directory##name_of_image##file_type_png#" 
+                         nameconflict="MAKEUNIQUE" 
+                         overwrite="yes" />
+                <!--- <cfimage action="write" source="#image#" destination="#path_server_directory##name_of_image##file_type_png#" nameconflict="MAKEUNIQUE"> --->
                                
                 <cfset search_text_area = replace(search_text_area, full_occurrence, path_url_directory & name_of_image & file_type_png, "All")>
                 <cfset file_name_on_server = #path_url_directory# & #name_of_image# & #file_type_png#>
@@ -159,7 +150,7 @@
             <cfoutput>
                 <cfset counter = counter+1>
                 <cfif counter GTE 15>
-                    <cfbreak><!------>
+                    <cfbreak>
                 </cfif>
                 <cfif first_pass eq true>
                     <cfset starting_index_url = find(path_url_directory, search_text_area)>
@@ -265,17 +256,7 @@
   
 
     <cflocation url="#referer_cfm_page#?msg=success&img=#return_image_file_name#"/> <!--- SUCCESS, send user back to calling page w/ file name---> 
-        <!---<cfabort> Create Image Thumbnail    
-        <cfif directoryExists(#path_server_directory# & "\thumb\" )> 
-        <cfset folder_thumb = "thumb">
-        <cfelse>
-        <cfset directoryCreate(#path_server_directory# & "\thumb\")>
-        <cfset folder_thumb = "thumb">
-        </cfif>
-        <cfimage action="resize" height="50" width="" 
-        source="#folder_user_cacedipi#\#return_image_file_name#" 
-        destination="#folder_user_cacedipi#\#folder_thumb#\#return_image_file_name#" overwrite="yes" />
-         --->
+
 <cfelse> 
  
       <cflocation url="#referer_cfm_page#?msg=not_post"/> <!--- fail, form not submitted --->
@@ -287,3 +268,27 @@
 
 </div>
 <!---END of file--->
+
+<!--- 
+    <cffunction name="dumpAll">
+        <cfdump var='#cgi#'>
+        <cfdump var="#form#"> 
+        <cfdump var="#variables#"> 
+        <cfdump var="#request#">
+    </cffunction>
+    <cfset dumpAll()>
+--->
+<!---
+    <cfabort> 
+    Create Image Thumbnail    
+    <cfif directoryExists(#path_server_directory# & "\thumb\" )> 
+        <cfset folder_thumb = "thumb">
+    <cfelse>
+        <cfset directoryCreate(#path_server_directory# & "\thumb\")>
+        <cfset folder_thumb = "thumb">
+    </cfif>
+    <cfimage action="resize" height="50" width="" 
+             source="#folder_user_cacedipi#\#return_image_file_name#" 
+             destination="#folder_user_cacedipi#\#folder_thumb#\#return_image_file_name#" 
+             overwrite="yes" />
+--->
